@@ -141,13 +141,25 @@ function mta_affiliate_admin_tab($event, $step)
 	
 }
 
-function mta_affiliate($atts)
+function mta_affiliate($atts, $thing)
 {
 	global $prefs;
 	
 	extract(lAtts(array(
 		'itunes_affiliate_id' => ''
 	),$atts));
+	
+	if ( ($prefs['mta_affiliate_itunes_enabled'] == true) && (!empty($prefs['mta_affiliate_itunes_id']) || !empty($itunes_affiliate_id)) ) {
+		// find all the iTunes affiliate links in the contents
+		// See https://affiliate.itunes.apple.com/resources/documentation/linking-to-the-itunes-music-store/
+		$thing = preg_replace('/(https?:\/\/itunes\.apple\.com\/[a-z]{2}\/[a-z0-9]+(?:\/[a-z0-9_+-]+)?\/id[0-9]+)(?:(\?[a-z0-9=%&+_-]+))?/gi', mta_affiliate_replace_itunes_links_callback, $thing);
+	}
+	
+	return $thing;
+}
+
+function mta_affiliate_replace_itunes_links_callback($matches)
+{
 	
 }
 
