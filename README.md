@@ -11,5 +11,5 @@ The `mta_affiliate` Textpattern plug-in implements an `<txp:mta_affiliate></txp:
 LICENSE
 -------
 
-_TBD._
+GNU GPLv2. See [LICENSE.txt](LICENSE.txt).
 
