@@ -13,7 +13,7 @@ $plugin['name'] = 'mta_affiliate';
 $plugin['version'] = '0.1';
 $plugin['author'] = 'Morgan Aldridge';
 $plugin['author_uri'] = 'http://www.makkintosshu.com/';
-$plugin['description'] = 'Automatically tag appropriate links with affiliate IDs for iTunes/App/iBooks Stores.';
+$plugin['description'] = 'Tag iTunes/iBooks/App Store links with affiliate IDs to earn commissions.';
 
 // Plugin types:
 // 0 = regular plugin; loaded on the public web side only
@@ -160,7 +160,23 @@ function mta_affiliate($atts, $thing)
 
 function mta_affiliate_replace_itunes_links_callback($matches)
 {
+	global $prefs;
 	
+	// if there's no query string on the URL, then just append a query string containing the iTunes Affiliate Program affiliate ID
+	if ( empty($matches[2]) )
+	{
+		$affiliateURL = $matches[0] . '?at=' . $prefs['mta_affiliate_itunes_id'];
+	} else {
+		// otherwise, is there an affiliate ID in the query string we need to replace?
+		$affiliateURL = $matches[1] . '?' . preg_replace('/([&^])at=[a-z0-9]([&$])/gi', 'at=' . $prefs['mta_affiliate_itunes_id'], $match[2], $count);
+		if ( $count == 0 )
+		{
+			// if there weren't any affiliate IDs to be replaced in the query string, just append it to the query string
+			$affiliateURL = $matches[1] . '?' . $matches[2] . '&at=' . $prefs['mta_affiliate_itunes_id'];
+		}
+	}
+	
+	return $affiliateURL;
 }
 
 # --- END PLUGIN CODE ---
