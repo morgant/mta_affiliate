@@ -149,13 +149,27 @@ function mta_affiliate($atts, $thing)
 		'itunes_affiliate_id' => ''
 	),$atts));
 	
+	// split $thing out into individual lines to try to avoid some limits in preg_replace_callback
+	$lines = explode('\n', parse($thing));
+	$new_thing = '';
+	
 	if ( ($prefs['mta_affiliate_itunes_enabled'] == true) && (!empty($prefs['mta_affiliate_itunes_id']) || !empty($itunes_affiliate_id)) ) {
 		// find all the iTunes affiliate links in the contents
 		// See https://affiliate.itunes.apple.com/resources/documentation/linking-to-the-itunes-music-store/
-		$thing = preg_replace('/(https?:\/\/itunes\.apple\.com\/[a-z]{2}\/[a-z0-9]+(?:\/[a-z0-9_+-]+)?\/id[0-9]+)(?:(\?[a-z0-9=%&+_-]+))?/gi', mta_affiliate_replace_itunes_links_callback, $thing);
+		$total_count = 0;
+		foreach ($lines as $line)
+		{
+			$new_line = preg_replace_callback('/(https?:\/\/itunes\.apple\.com\/(?:[a-z]{2}\/)?[a-z0-9]+(?:\/[a-z0-9_+-]+)?\/id[0-9]+)(?:(\?[a-z0-9=%&+_-]+))?/i', 'mta_affiliate_replace_itunes_links_callback', $line, -1, $count);
+			$total_count += $count;
+		}
+		if ( $new_line === NULL )
+		{
+			$new_line = $line;
+		}
+		$new_thing .= $new_line . "\n";
 	}
 	
-	return $thing;
+	return $new_thing . "<!-- mta_affiliate replaced $total_count iTunes URLs -->";
 }
 
 function mta_affiliate_replace_itunes_links_callback($matches)
@@ -168,11 +182,11 @@ function mta_affiliate_replace_itunes_links_callback($matches)
 		$affiliateURL = $matches[0] . '?at=' . $prefs['mta_affiliate_itunes_id'];
 	} else {
 		// otherwise, is there an affiliate ID in the query string we need to replace?
-		$affiliateURL = $matches[1] . '?' . preg_replace('/([&^])at=[a-z0-9]([&$])/gi', 'at=' . $prefs['mta_affiliate_itunes_id'], $match[2], $count);
+		$affiliateURL = $matches[1] . preg_replace('/([&^])at=[a-z0-9]([&$])/i', 'at=' . $prefs['mta_affiliate_itunes_id'], $match[2], $count);
 		if ( $count == 0 )
 		{
 			// if there weren't any affiliate IDs to be replaced in the query string, just append it to the query string
-			$affiliateURL = $matches[1] . '?' . $matches[2] . '&at=' . $prefs['mta_affiliate_itunes_id'];
+			$affiliateURL = $matches[1] . $matches[2] . '&at=' . $prefs['mta_affiliate_itunes_id'];
 		}
 	}
 	
