@@ -34,8 +34,8 @@ This plug-in will update appropriate URLs with versions tagged with your "iTunes
 
 The following preferences need to be set and can be later changed from the "mta_affiliate" tab under the "Extensions" tab:
 
-* *Tag iTunes Affiliate Program Links* - Whether you want to tag iTunes Affiliate Program links or not. This makes it easy to enable/disable affiliate link tagging without having to remove tags from pages or forms where they might have been used.
-* *iTunes Affiliate Program ID* - Your iTunes Affiliate Program affiliate ID.
+* *Enable iTunes Affiliate Program links?* - Whether you want to tag iTunes Affiliate Program links or not. This makes it easy to enable/disable affiliate link tagging without having to remove tags from pages or forms where they might have been used.
+* *iTunes Affiliate Program affiliate ID* - Your iTunes Affiliate Program affiliate ID.
 
 It also implements the following container tag:
 
@@ -137,7 +137,7 @@ function mta_affiliate_admin_tab($event, $step)
 	$publish_form .= fInput('submit', 'submit', 'Save')."\n";
 	
 	// output the publish form
-	print(form($publish_form, 'margin-left: auto; margin-right: auto;'));
+	print(form($publish_form, 'width: 400px; margin-left: auto; margin-right: auto;'));
 	
 }
 
@@ -174,7 +174,8 @@ function mta_affiliate($atts, $thing)
 		}
 	}
 	
-	return $new_thing . "\n<!-- mta_affiliate replaced $total_count iTunes URLs -->";
+	//return $new_thing . "\n<!-- mta_affiliate replaced $total_count iTunes URLs -->";
+	return $new_thing;
 }
 
 function mta_affiliate_replace_itunes_links_callback($matches)
